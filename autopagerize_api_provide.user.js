@@ -7,25 +7,51 @@
 // ==/UserScript==
 
 (function() {
-	// set event listeners
-	function addEventListeners(hookNodeId, targetClassNameRE) {
-		var DEBUG = false;
+	var DEBUG = true;
+	
+	var SITEINFO = [
+		// Hatena Bookmark (Search result)
+		{
+			url:             '^http://b\\.hatena\\.ne\\.jp/search\\?',
+			pageElement:     'res',
+			targetClassName: 'search-result-list',
+			nextLink:        './preceding-sibling::div[contains(concat(" ", @class, " "), " pager-autopagerize ")][1]/a[last()]',
+ 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
+ 		},
+		// Hatena Bookmark (Tag page / Keyword page / Local page / Hotentry page / ASIN page / Video page)
+		{
+			url:             '^http://b\\.hatena\\.ne\\.jp/(?:(?:t|keyword|location|entrylist)/|(?:entrylist|asin|video)(?:\\?|$))',
+			pageElement:     'res',
+			targetClassName: '(?:hotentry|videolist)',
+			nextLink:        './preceding-sibling::div[contains(concat(" ", @class, " "), " pager-autopagerize ")][1]/a[last()]',
+			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
+		},
+		// Hatena Bookmark (User page)
+		{
+			url:             '^http://b\\.hatena\\.ne\\.jp/',
+			pageElement:     'hatena-body',
+			targetClassName: 'bookmarked_user',
+			nextLink:        './preceding-sibling::div[contains(concat(" ", @class, " "), " pager-autopagerize ")][1]/a[last()]',
+			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
+		},
+	];
 
+	// set event listeners
+	function addEventListeners(siteinfo) {
 		var filters = [];
 		var docFilters = [];
 
-		var hookNode = document.getElementById(hookNodeId);
+		var pageElement = document.getElementById(siteinfo['pageElement']);
 
-		if (hookNode) {
+		if (pageElement) {
 			// DOMNodeInserted event
-			hookNode.addEventListener('DOMNodeInserted',function(evt) {
-				if (targetClassNameRE.test(evt.target.className)) {
+			pageElement.addEventListener('DOMNodeInserted',function(evt) {
+				if (evt.target.className.match('\\b' + siteinfo['targetClassName'] + '\\b')) {
 					// Target is parent node of the added node.
 					var targetNode = evt.target;
 					var parentNode = evt.relatedNode;
 
-					var insertedPageLinkXPath = './preceding-sibling::div[contains(concat(" ", @class, " "), " pager-autopagerize ")][1]/a[last()]'
-					var insertedURL = document.evaluate(insertedPageLinkXPath, targetNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
+					var insertedURL = document.evaluate(siteinfo['nextLink'], targetNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
 
 					// Apply document filters
 					docFilters.forEach(function(f) { f(targetNode, insertedURL, {}) });
@@ -47,12 +73,11 @@
 
 			// AutoPagerizeToggleRequest event
 			document.addEventListener('AutoPagerizeToggleRequest', function(evt) {
-				var pointerXPath = '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]'
-				var pointer = document.evaluate(pointerXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+				var toggle = document.evaluate(siteinfo['toggle'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
 				var ev3 = document.createEvent('Event');
 				ev3.initEvent('click', true, false);
-				pointer.dispatchEvent(ev3);
+				toggle.dispatchEvent(ev3);
 			}, false)
 
 			// AutoPagerize APIs
@@ -72,15 +97,18 @@
 			document.dispatchEvent(ev4)
 		}
 	}
-
-	if (/^http:\/\/b\.hatena\.ne\.jp\/search\?/.test(location.href)) {
-		// Search result
-		addEventListeners('res', /\bsearch-result-list\b/);
-	} else if (/^http:\/\/b\.hatena\.ne\.jp\/(?:(?:t|keyword|location|entrylist)\/|(?:entrylist|asin|video)(?:\?|$))/.test(location.href)) {
-		// Tag page / Keyword page / Local page / Hotentry page / ASIN page / Video page
-		addEventListeners('main', /\b(?:hotentry|videolist)\b/);
-	} else {
-		// Others (user page)
-		addEventListeners('hatena-body', /\bbookmarked_user\b/);
+	
+	function launchAutoPager(siteinfo) {
+		if (siteinfo.length > 0) {
+			for (var i = 0; i < siteinfo.length; i++) {
+				if (location.href.match(siteinfo[i]['url'])) {
+					if (DEBUG) { GM_log("SITEINFO : " + siteinfo[i]['url']); }
+					addEventListeners(siteinfo[i]);
+					break;
+				}
+			}
+		}
 	}
+	
+	launchAutoPager(SITEINFO);
 })();
