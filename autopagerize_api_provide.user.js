@@ -83,9 +83,9 @@
 
 			// AutoPagerizeToggleRequest event
 			if (siteinfo['toggle']) {
-				var toggle = document.evaluate(siteinfo['toggle'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
 				document.addEventListener('AutoPagerizeToggleRequest', function(evt) {
+					var toggle = document.evaluate(siteinfo['toggle'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
 					var ev3 = document.createEvent('Event');
 					ev3.initEvent('click', true, false);
 					toggle.dispatchEvent(ev3);
