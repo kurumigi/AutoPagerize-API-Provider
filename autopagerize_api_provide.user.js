@@ -34,6 +34,12 @@
 			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
+		// Twitter
+		{
+			url:             '^https?://twitter\\.com/',
+			pageElement:     'page-container',
+			targetClassName: '(?:stream-item|component)',
+		},
 	];
 
 	// set event listeners
