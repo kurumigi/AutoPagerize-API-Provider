@@ -51,7 +51,11 @@
 					var targetNode = evt.target;
 					var parentNode = evt.relatedNode;
 
-					var insertedURL = document.evaluate(siteinfo['nextLink'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
+					// Get next page URL.
+					var insertedURL = '';
+					if (siteinfo['nextLink']) {
+						insertedURL = document.evaluate(siteinfo['nextLink'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
+					}
 
 					// Apply document filters
 					docFilters.forEach(function(f) { f(targetNode, insertedURL, {}) });
@@ -72,13 +76,16 @@
 			}, false);
 
 			// AutoPagerizeToggleRequest event
-			document.addEventListener('AutoPagerizeToggleRequest', function(evt) {
+			if (siteinfo['toggle']) {
 				var toggle = document.evaluate(siteinfo['toggle'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
-				var ev3 = document.createEvent('Event');
-				ev3.initEvent('click', true, false);
-				toggle.dispatchEvent(ev3);
-			}, false)
+				document.addEventListener('AutoPagerizeToggleRequest', function(evt) {
+					var ev3 = document.createEvent('Event');
+					ev3.initEvent('click', true, false);
+					toggle.dispatchEvent(ev3);
+				}, false)
+			}
+			
 
 			// AutoPagerize APIs
 			window.AutoPagerize = {};
