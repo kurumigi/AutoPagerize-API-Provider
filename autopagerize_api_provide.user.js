@@ -15,15 +15,15 @@
 			url:             '^http://b\\.hatena\\.ne\\.jp/search\\?',
 			pageElement:     'res',
 			targetClassName: 'search-result-list',
-			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[contains(concat(" ", @class, " "), " pager-next ")]',
- 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
- 		},
+			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
+			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
+		},
 		// Hatena Bookmark (Tag page / Keyword page / Local page / Hotentry page / ASIN page / Video page)
 		{
 			url:             '^http://b\\.hatena\\.ne\\.jp/(?:(?:t|keyword|location|entrylist)/|(?:entrylist|asin|video)(?:\\?|$))',
 			pageElement:     'main',
 			targetClassName: '(?:hotentry|videolist)',
-			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[contains(concat(" ", @class, " "), " pager-next ")]',
+			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
 		// Hatena Bookmark (User page)
@@ -31,7 +31,7 @@
 			url:             '^http://b\\.hatena\\.ne\\.jp/',
 			pageElement:     'hatena-body',
 			targetClassName: 'bookmarked_user',
-			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[contains(concat(" ", @class, " "), " pager-next ")]',
+			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
 	];
