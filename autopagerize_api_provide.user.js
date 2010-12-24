@@ -15,15 +15,15 @@
 			url:             '^http://b\\.hatena\\.ne\\.jp/search\\?',
 			pageElement:     'res',
 			targetClassName: 'search-result-list',
-			nextLink:        './preceding-sibling::div[contains(concat(" ", @class, " "), " pager-autopagerize ")][1]/a[last()]',
+			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[contains(concat(" ", @class, " "), " pager-next ")]',
  			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
  		},
 		// Hatena Bookmark (Tag page / Keyword page / Local page / Hotentry page / ASIN page / Video page)
 		{
 			url:             '^http://b\\.hatena\\.ne\\.jp/(?:(?:t|keyword|location|entrylist)/|(?:entrylist|asin|video)(?:\\?|$))',
-			pageElement:     'res',
+			pageElement:     'main',
 			targetClassName: '(?:hotentry|videolist)',
-			nextLink:        './preceding-sibling::div[contains(concat(" ", @class, " "), " pager-autopagerize ")][1]/a[last()]',
+			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[contains(concat(" ", @class, " "), " pager-next ")]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
 		// Hatena Bookmark (User page)
@@ -31,7 +31,7 @@
 			url:             '^http://b\\.hatena\\.ne\\.jp/',
 			pageElement:     'hatena-body',
 			targetClassName: 'bookmarked_user',
-			nextLink:        './preceding-sibling::div[contains(concat(" ", @class, " "), " pager-autopagerize ")][1]/a[last()]',
+			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[contains(concat(" ", @class, " "), " pager-next ")]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
 	];
@@ -51,7 +51,7 @@
 					var targetNode = evt.target;
 					var parentNode = evt.relatedNode;
 
-					var insertedURL = document.evaluate(siteinfo['nextLink'], targetNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
+					var insertedURL = document.evaluate(siteinfo['nextLink'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
 
 					// Apply document filters
 					docFilters.forEach(function(f) { f(targetNode, insertedURL, {}) });
