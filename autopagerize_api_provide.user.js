@@ -95,7 +95,7 @@
 						// Get next page URL.
 						var insertedURL = '';
 						if (siteinfo['nextLink']) {
-							insertedURL = document.evaluate(siteinfo['nextLink'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
+							insertedURL = getFirstElementByXPath(siteinfo['nextLink']).href;
 						}
 
 						// Apply document filters
@@ -120,7 +120,7 @@
 			// AutoPagerizeToggleRequest event
 			if (siteinfo['toggle']) {
 				document.addEventListener('AutoPagerizeToggleRequest', function(evt) {
-					var toggle = document.evaluate(siteinfo['toggle'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+					var toggle = getFirstElementByXPath(siteinfo['toggle']);
 
 					var ev3 = document.createEvent('Event');
 					ev3.initEvent('click', true, false);
