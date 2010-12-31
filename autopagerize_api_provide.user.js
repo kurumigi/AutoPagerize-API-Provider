@@ -44,6 +44,38 @@
 		},
 	];
 
+	// utility functions from AutoPagerize
+	function getElementsByXPath(xpath, node) {
+		var nodesSnapshot = getXPathResult(xpath, node, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE)
+		var data = []
+		for (var i = 0; i < nodesSnapshot.snapshotLength; i++) {
+			data.push(nodesSnapshot.snapshotItem(i))
+		}
+		return data
+	}
+
+	function getFirstElementByXPath(xpath, node) {
+		var result = getXPathResult(xpath, node, XPathResult.FIRST_ORDERED_NODE_TYPE)
+		return result.singleNodeValue
+	}
+
+	function getXPathResult(xpath, node, resultType) {
+		var node = node || document
+		var doc = node.ownerDocument || node
+		var resolver = doc.createNSResolver(node.documentElement || node)
+		var defaultNS = node.lookupNamespaceURI(null)
+
+		if (defaultNS) {
+			const defaultPrefix = '__default__'
+			xpath = addDefaultPrefix(xpath, defaultPrefix)
+			var defaultResolver = resolver
+			resolver = function (prefix) {
+				return (prefix == defaultPrefix) ? defaultNS : defaultResolver.lookupNamespaceURI(prefix)
+			}
+		}
+		return doc.evaluate(xpath, node, resolver, resultType, null)
+	}
+
 	// set event listeners
 	function addEventListeners(siteinfo) {
 		var filters = [];
