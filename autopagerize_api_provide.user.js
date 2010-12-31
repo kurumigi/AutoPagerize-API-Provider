@@ -3,6 +3,7 @@
 // @namespace      http://d.hatena.ne.jp/kurumigi/
 // @description    Provide APIs compatible with "AutoPagerize" in Hatena Bookmark
 // @include        http://b.hatena.ne.jp/*
+// @include        http://h1beta.hatena.ne.jp/*
 // @include        http://twitter.com/*
 // @include        https://twitter.com/*
 // @licence        GPL
