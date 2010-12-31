@@ -15,7 +15,7 @@
 		// Hatena Bookmark (Search result)
 		{
 			url:             '^http://b\\.hatena\\.ne\\.jp/search\\?',
-			pageElement:     'res',
+			pageElement:     'id("res")',
 			targetClassName: 'search-result-list',
 			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
@@ -23,7 +23,7 @@
 		// Hatena Bookmark (Tag page / Keyword page / Local page / Hotentry page / ASIN page / Video page)
 		{
 			url:             '^http://b\\.hatena\\.ne\\.jp/(?:(?:t|keyword|location|entrylist)/|(?:entrylist|asin|video)(?:\\?|$))',
-			pageElement:     'main',
+			pageElement:     'id("main")',
 			targetClassName: '(?:hotentry|videolist)',
 			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
@@ -31,7 +31,7 @@
 		// Hatena Bookmark (User page)
 		{
 			url:             '^http://b\\.hatena\\.ne\\.jp/',
-			pageElement:     'hatena-body',
+			pageElement:     'id("hatena-body")',
 			targetClassName: 'bookmarked_user',
 			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
@@ -39,7 +39,7 @@
 		// Twitter
 		{
 			url:             '^https?://twitter\\.com/',
-			pageElement:     'page-container',
+			pageElement:     'id("page-container")',
 			targetClassName: '(?:stream-item|component)',
 		},
 	];
@@ -81,39 +81,41 @@
 		var filters = [];
 		var docFilters = [];
 
-		var pageElement = document.getElementById(siteinfo['pageElement']);
+		var pageElement = getElementsByXPath(siteinfo['pageElement']);
 
-		if (pageElement) {
+		if (pageElement.length > 0) {
 			// DOMNodeInserted event
-			pageElement.addEventListener('DOMNodeInserted',function(evt) {
-				if (evt.target.className.match('\\b' + siteinfo['targetClassName'] + '\\b')) {
-					// Target is parent node of the added node.
-					var targetNode = evt.target;
-					var parentNode = evt.relatedNode;
+			for (var i = 0; i < pageElement.length; i++) {
+				pageElement[i].addEventListener('DOMNodeInserted',function(evt) {
+					if (evt.target.className.match('\\b' + siteinfo['targetClassName'] + '\\b')) {
+						// Target is parent node of the added node.
+						var targetNode = evt.target;
+						var parentNode = evt.relatedNode;
 
-					// Get next page URL.
-					var insertedURL = '';
-					if (siteinfo['nextLink']) {
-						insertedURL = document.evaluate(siteinfo['nextLink'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
+						// Get next page URL.
+						var insertedURL = '';
+						if (siteinfo['nextLink']) {
+							insertedURL = document.evaluate(siteinfo['nextLink'], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.href;
+						}
+
+						// Apply document filters
+						docFilters.forEach(function(f) { f(targetNode, insertedURL, {}) });
+
+						// Dispatch 'AutoPagerize_DOMNodeInserted' event
+						var ev1 = document.createEvent('MutationEvent');
+						ev1.initMutationEvent('AutoPagerize_DOMNodeInserted', true, false, parentNode, null, insertedURL, null, null);
+						targetNode.dispatchEvent(ev1);
+
+						// Apply filters
+						filters.forEach(function(f) { f([targetNode]) });
+
+						// Dispatch 'GM_AutoPagerizeNextPageLoaded' event
+						var ev2 = document.createEvent('Event');
+						ev2.initEvent('GM_AutoPagerizeNextPageLoaded', true, false);
+						document.dispatchEvent(ev2);
 					}
-
-					// Apply document filters
-					docFilters.forEach(function(f) { f(targetNode, insertedURL, {}) });
-
-					// Dispatch 'AutoPagerize_DOMNodeInserted' event
-					var ev1 = document.createEvent('MutationEvent');
-					ev1.initMutationEvent('AutoPagerize_DOMNodeInserted', true, false, parentNode, null, insertedURL, null, null);
-					targetNode.dispatchEvent(ev1);
-
-					// Apply filters
-					filters.forEach(function(f) { f([targetNode]) });
-
-					// Dispatch 'GM_AutoPagerizeNextPageLoaded' event
-					var ev2 = document.createEvent('Event');
-					ev2.initEvent('GM_AutoPagerizeNextPageLoaded', true, false);
-					document.dispatchEvent(ev2);
-				}
-			}, false);
+				}, false);
+			}
 
 			// AutoPagerizeToggleRequest event
 			if (siteinfo['toggle']) {
