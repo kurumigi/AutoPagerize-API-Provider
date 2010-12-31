@@ -36,6 +36,12 @@
 			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
+		// Hatena Haiku 1.1
+		{
+			url:             '^http://h1beta\\.hatena\\.ne\\.jp/',
+			pageElement:     'id("main")',
+			insertedNode:    'descendant-or-self::div[contains(concat(" ", @class, " "), " entry ")]',
+		},
 		// Twitter
 		{
 			url:             '^https?://twitter\\.com/',
