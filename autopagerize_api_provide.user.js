@@ -5,6 +5,7 @@
 // @include        http://b.hatena.ne.jp/*
 // @include        http://twitter.com/*
 // @include        https://twitter.com/*
+// @licence        GPL
 // ==/UserScript==
 
 (function() {
