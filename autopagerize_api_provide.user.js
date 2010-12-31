@@ -2,8 +2,9 @@
 // @name           AutoPagerize API Provider in Hatena Bookmark
 // @namespace      http://d.hatena.ne.jp/kurumigi/
 // @description    Provide APIs compatible with "AutoPagerize" in Hatena Bookmark
-// @include        http://b.hatena.ne.jp/*/*
-// @include        http://b.hatena.ne.jp/search?*
+// @include        http://b.hatena.ne.jp/*
+// @include        http://twitter.com/*
+// @include        https://twitter.com/*
 // ==/UserScript==
 
 (function() {
