@@ -16,7 +16,7 @@
 		{
 			url:             '^http://b\\.hatena\\.ne\\.jp/search\\?',
 			pageElement:     'id("res")',
-			targetClassName: 'search-result-list',
+			insertedNode:    'descendant-or-self::ul[contains(concat(" ", @class, " "), " search-result-list ")]',
 			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
@@ -24,7 +24,7 @@
 		{
 			url:             '^http://b\\.hatena\\.ne\\.jp/(?:(?:t|keyword|location|entrylist)/|(?:entrylist|asin|video)(?:\\?|$))',
 			pageElement:     'id("main")',
-			targetClassName: '(?:hotentry|videolist)',
+			insertedNode:    'descendant-or-self::ul[contains(concat(" ", @class, " "), " hotentry ")] | descendant-or-self::ul[contains(concat(" ", @class, " "), " videolist ")]',
 			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
@@ -32,7 +32,7 @@
 		{
 			url:             '^http://b\\.hatena\\.ne\\.jp/',
 			pageElement:     'id("hatena-body")',
-			targetClassName: 'bookmarked_user',
+			insertedNode:    'descendant-or-self::ul[contains(concat(" ", @class, " "), " bookmarked_user ")]',
 			nextLink:        '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")][last()]//a[last()]',
 			toggle:          '//div[contains(concat(" ", @class, " "), " pager-autopagerize ")]//img[@class="pointer"]',
 		},
@@ -40,7 +40,7 @@
 		{
 			url:             '^https?://twitter\\.com/',
 			pageElement:     'id("page-container")',
-			targetClassName: '(?:stream-item|component)',
+			insertedNode:    'descendant-or-self::div[contains(concat(" ", @class, " "), " stream-item ")] | descendant-or-self::div[contains(concat(" ", @class, " "), " component ")]',
 		},
 	];
 
@@ -87,8 +87,9 @@
 			// DOMNodeInserted event
 			for (var i = 0; i < pageElement.length; i++) {
 				pageElement[i].addEventListener('DOMNodeInserted',function(evt) {
-					if (evt.target.className.match('\\b' + siteinfo['targetClassName'] + '\\b')) {
-						// Target is parent node of the added node.
+					// check inserted nodes
+					if (getElementsByXPath(siteinfo['insertedNode'], evt.target).length > 0) {
+						// relatedNode is a parent node of an inserted node.
 						var targetNode = evt.target;
 						var parentNode = evt.relatedNode;
 
